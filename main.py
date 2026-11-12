@@ -87,7 +87,10 @@ class Bot:
             if self.cooldown > 0 or len(self.closes) <= LOOK:
                 return []
             if self.dip_bps() <= -ENTRY_BPS:
-                notional = min(state.cash, state.weight_room(SYMBOL))
+                # Leave a hair of cash spare so the 4 bps fee can never make a
+                # full-cash buy overdraw the account (insufficient_cash).
+                notional = min(state.cash - state.cash // 2000,
+                               state.weight_room(SYMBOL))
                 if notional >= MIN_NOTIONAL:
                     self.entry_px = close
                     self.entry_bar = len(self.closes) - 1
